@@ -147,6 +147,53 @@ namespace Spectre.Console
         }
 
         /// <summary>
+        /// Marks multiple items as selected.
+        /// </summary>
+        /// <typeparam name="T">The prompt result type.</typeparam>
+        /// <param name="obj">The prompt.</param>
+        /// <param name="item">The items to select.</param>
+        /// <param name="items">The other items to select.</param>
+        /// <returns>The same instance so that multiple calls can be chained.</returns>
+        public static MultiSelectionPrompt<T> Select<T>(this MultiSelectionPrompt<T> obj, T item, params T[] items)
+            where T : notnull
+        {
+            if (obj is null)
+            {
+                throw new ArgumentNullException(nameof(obj));
+            }
+
+            return obj.Select(item).Select(items);
+        }
+
+        /// <summary>
+        /// Marks multiple items as selected.
+        /// </summary>
+        /// <typeparam name="T">The prompt result type.</typeparam>
+        /// <param name="obj">The prompt.</param>
+        /// <param name="items">The items to select.</param>
+        /// <returns>The same instance so that multiple calls can be chained.</returns>
+        public static MultiSelectionPrompt<T> Select<T>(this MultiSelectionPrompt<T> obj, IEnumerable<T> items)
+            where T : notnull
+        {
+            if (obj is null)
+            {
+                throw new ArgumentNullException(nameof(obj));
+            }
+
+            if (items == null)
+            {
+                throw new ArgumentNullException(nameof(items));
+            }
+
+            foreach (var item in items)
+            {
+                obj.Select(item);
+            }
+
+            return obj;
+        }
+
+        /// <summary>
         /// Sets the title.
         /// </summary>
         /// <typeparam name="T">The prompt result type.</typeparam>

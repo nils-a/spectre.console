@@ -82,5 +82,42 @@ namespace Spectre.Console.Tests.Unit
             // Then
             choice.IsSelected.ShouldBeTrue();
         }
+        
+        [Fact]
+        public void Should_Mark_Multiple_Custom_Items_As_Selected_If_The_Same_Reference_Is_Used()
+        {
+            // Given
+            var prompt = new MultiSelectionPrompt<CustomItem>();
+            var item1 = new CustomItem { X = 18, Y = 32 };
+            var item2 = new CustomItem { X = 19, Y = 33 };
+            var choice1 = prompt.AddChoice(item1);
+            var choice2 = prompt.AddChoice(item2);
+
+            // When
+            prompt.Select(item1, item2);
+
+            // Then
+            choice1.IsSelected.ShouldBeTrue();
+            choice2.IsSelected.ShouldBeTrue();
+        }
+        
+        [Fact]
+        public void Should_Mark_Multiple_Custom_Items_As_Selected_If_The_Same_Reference_Is_Used_Using_The_Enumerable()
+        {
+            // Given
+            var prompt = new MultiSelectionPrompt<CustomItem>();
+            var item1 = new CustomItem { X = 18, Y = 32 };
+            var item2 = new CustomItem { X = 19, Y = 33 };
+            var choice1 = prompt.AddChoice(item1);
+            var choice2 = prompt.AddChoice(item2);
+
+            // When
+            prompt.Select(new[]{item1, item2});
+
+            // Then
+            choice1.IsSelected.ShouldBeTrue();
+            choice2.IsSelected.ShouldBeTrue();
+        }
+        
     }
 }
