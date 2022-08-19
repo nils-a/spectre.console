@@ -11,7 +11,7 @@ internal sealed class DefaultTypeResolver : IDisposable, ITypeResolver
 
     public DefaultTypeResolver(ComponentRegistry? registry)
     {
-        Registry = registry ?? new ComponentRegistry();
+        Registry = registry?.CreateCopy() ?? new ComponentRegistry();
     }
 
     public void Dispose()

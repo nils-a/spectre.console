@@ -1,6 +1,6 @@
 namespace Spectre.Console.Internal;
 
-internal sealed class DefaultExclusivityMode : IExclusivityMode
+internal sealed class DefaultExclusivityMode : IExclusivityMode, IDisposable
 {
     private readonly SemaphoreSlim _semaphore;
 
@@ -49,4 +49,9 @@ internal sealed class DefaultExclusivityMode : IExclusivityMode
         "Trying to run one or more interactive functions concurrently. " +
         "Operations with dynamic displays (e.g. a prompt and a progress display) " +
         "cannot be running at the same time.");
+
+    public void Dispose()
+    {
+        _semaphore.Dispose();
+    }
 }

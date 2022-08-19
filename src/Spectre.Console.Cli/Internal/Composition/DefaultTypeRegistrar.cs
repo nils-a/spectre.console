@@ -18,7 +18,9 @@ internal sealed class DefaultTypeRegistrar : ITypeRegistrar
             action(container.Registry);
         }
 
+#pragma warning disable IDISP005 // not sure how to solve this. Should the ITypeResolver be IDisposable "just in case"?
         return container;
+#pragma warning restore IDISP005
     }
 
     public void Register(Type service, Type implementation)

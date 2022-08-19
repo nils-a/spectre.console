@@ -3,7 +3,7 @@ namespace Spectre.Console;
 /// <summary>
 /// A console recorder used to record output from a console.
 /// </summary>
-public class Recorder : IAnsiConsole, IDisposable
+public class Recorder : IAnsiConsole
 {
     private readonly IAnsiConsole _console;
     private readonly List<IRenderable> _recorded;
@@ -31,13 +31,6 @@ public class Recorder : IAnsiConsole, IDisposable
     {
         _console = console ?? throw new ArgumentNullException(nameof(console));
         _recorded = new List<IRenderable>();
-    }
-
-    /// <inheritdoc/>
-    [SuppressMessage("Usage", "CA1816:Dispose methods should call SuppressFinalize")]
-    public void Dispose()
-    {
-        // Only used for scoping.
     }
 
     /// <inheritdoc/>

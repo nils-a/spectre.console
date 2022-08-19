@@ -11,7 +11,7 @@ namespace Spectre.Console;
 /// <summary>
 /// Represents a renderable image.
 /// </summary>
-public sealed class CanvasImage : Renderable
+public sealed class CanvasImage : Renderable, IDisposable
 {
     private static readonly IResampler _defaultResampler = KnownResamplers.Bicubic;
 
@@ -139,5 +139,11 @@ public sealed class CanvasImage : Renderable
         }
 
         return ((IRenderable)canvas).Render(context, maxWidth);
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        Image.Dispose();
     }
 }

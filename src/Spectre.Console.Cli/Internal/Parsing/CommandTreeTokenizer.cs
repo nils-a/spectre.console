@@ -27,20 +27,26 @@ internal static class CommandTreeTokenizer
         var position = 0;
         var previousReader = default(TextBuffer);
         var context = new CommandTreeTokenizerContext();
-
-        foreach (var arg in args)
+        try
         {
-            var start = position;
-            var reader = new TextBuffer(previousReader, arg);
+#pragma warning disable IDISP001,IDISP003 // TextBuffer will Dispose the original buffer.
+            foreach (var arg in args)
+            {
+                var start = position;
+                var reader = new TextBuffer(previousReader, arg);
 
-            // Parse the token.
-            position = ParseToken(context, reader, position, start, tokens);
-            context.FlushRemaining();
+                // Parse the token.
+                position = ParseToken(context, reader, position, start, tokens);
+                context.FlushRemaining();
 
-            previousReader = reader;
+                previousReader = reader;
+            }
+#pragma warning restore IDISP001,IDISP003
         }
-
-        previousReader?.Dispose();
+        finally
+        {
+            previousReader?.Dispose();
+        }
 
         return new CommandTreeTokenizerResult(
             new CommandTreeTokenStream(tokens),

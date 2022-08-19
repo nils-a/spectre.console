@@ -41,7 +41,7 @@ public static class StringExtensions
 
         var result = new StringBuilder();
 
-        var tokenizer = new MarkupTokenizer(text);
+        using var tokenizer = new MarkupTokenizer(text);
         while (tokenizer.MoveNext() && tokenizer.Current != null)
         {
             if (tokenizer.Current.Kind == MarkupTokenKind.Text)
