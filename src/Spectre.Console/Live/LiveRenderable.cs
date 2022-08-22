@@ -9,11 +9,31 @@ internal sealed class LiveRenderable : Renderable
     private IRenderable? _renderable;
     private SegmentShape? _shape;
 
-    public IRenderable? Target => _renderable;
+    public IRenderable? Target
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return _renderable;
+            }
+        }
+    }
+
     public bool DidOverflow { get; private set; }
 
     [MemberNotNullWhen(true, nameof(Target))]
-    public bool HasRenderable => _renderable != null;
+    public bool HasRenderable
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return _renderable != null;
+            }
+        }
+    }
+
     public VerticalOverflow Overflow { get; set; }
     public VerticalOverflowCropping OverflowCropping { get; set; }
 

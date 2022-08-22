@@ -18,11 +18,17 @@ public sealed class SpinnerColumn : ProgressColumn
     protected internal override bool NoWrap => true;
 
     /// <summary>
-    /// Gets or sets the <see cref="Console.Spinner"/>.
+    /// Gets or sets the <see cref="Spectre.Console.Spinner"/>.
     /// </summary>
     public Spinner Spinner
     {
-        get => _spinner;
+        get
+        {
+            lock (_lock)
+            {
+                return _spinner;
+            }
+        }
         set
         {
             lock (_lock)
@@ -39,11 +45,20 @@ public sealed class SpinnerColumn : ProgressColumn
     /// </summary>
     public string? CompletedText
     {
-        get => _completed;
+        get
+        {
+            lock (_lock)
+            {
+                return _completed;
+            }
+        }
         set
         {
-            _completed = value;
-            _maxWidth = null;
+            lock (_lock)
+            {
+                _completed = value;
+                _maxWidth = null;
+            }
         }
     }
 
@@ -53,11 +68,20 @@ public sealed class SpinnerColumn : ProgressColumn
     /// </summary>
     public string? PendingText
     {
-        get => _pending;
+        get
+        {
+            lock (_lock)
+            {
+                return _pending;
+            }
+        }
         set
         {
-            _pending = value;
-            _maxWidth = null;
+            lock (_lock)
+            {
+                _pending = value;
+                _maxWidth = null;
+            }
         }
     }
 

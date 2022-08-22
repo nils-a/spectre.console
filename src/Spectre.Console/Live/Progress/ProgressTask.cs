@@ -11,6 +11,8 @@ public sealed class ProgressTask : IProgress<double>
     private double _maxValue;
     private string _description;
     private double _value;
+    private DateTime? _startTime;
+    private DateTime? _stopTime;
 
     /// <summary>
     /// Gets the task ID.
@@ -47,12 +49,44 @@ public sealed class ProgressTask : IProgress<double>
     /// <summary>
     /// Gets the start time of the task.
     /// </summary>
-    public DateTime? StartTime { get; private set; }
+    public DateTime? StartTime
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return _startTime;
+            }
+        }
+        private set
+        {
+            lock (_lock)
+            {
+                _startTime = value;
+            }
+        }
+    }
 
     /// <summary>
     /// Gets the stop time of the task.
     /// </summary>
-    public DateTime? StopTime { get; private set; }
+    public DateTime? StopTime
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return _stopTime;
+            }
+        }
+        private set
+        {
+            lock (_lock)
+            {
+                _stopTime = value;
+            }
+        }
+    }
 
     /// <summary>
     /// Gets the task state.
@@ -62,12 +96,30 @@ public sealed class ProgressTask : IProgress<double>
     /// <summary>
     /// Gets a value indicating whether or not the task has started.
     /// </summary>
-    public bool IsStarted => StartTime != null;
+    public bool IsStarted
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return StartTime != null;
+            }
+        }
+    }
 
     /// <summary>
     /// Gets a value indicating whether or not the task has finished.
     /// </summary>
-    public bool IsFinished => StopTime != null || Value >= MaxValue;
+    public bool IsFinished
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return StopTime != null || Value >= MaxValue;
+            }
+        }
+    }
 
     /// <summary>
     /// Gets the percentage done of the task.
