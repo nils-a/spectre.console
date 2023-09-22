@@ -23,19 +23,66 @@ public sealed class TypeRegistrarBaseTests
     /// <exception cref="TestFailedException">This exception is raised, if a test fails.</exception>
     public void RunAllTests()
     {
-        var testCases = new Action<ITypeRegistrar>[]
+        var testCases = new[]
         {
                 RegistrationsCanBeResolved,
                 InstanceRegistrationsCanBeResolved,
                 LazyRegistrationsCanBeResolved,
                 ResolvingNotRegisteredServiceReturnsNull,
                 ResolvingNullTypeReturnsNull,
+                RegisteringTypesMultipleTimesDoesNotFail,
+                ResolvingATypeThatWasRegisteredMultipleTimesResultsInTheFirstRegistration,
         };
 
         foreach (var test in testCases)
         {
             test(_registrarFactory());
         }
+    }
+
+    private static void ResolvingATypeThatWasRegisteredMultipleTimesResultsInTheFirstRegistration(ITypeRegistrar registrar)
+    {
+        // given
+        var instance = new MockService();
+        registrar.RegisterInstance(typeof(IMockService), instance);
+        registrar.RegisterInstance(typeof(IMockService), new MockService());
+        registrar.RegisterLazy(typeof(IMockService), () => new MockService());
+        registrar.Register(typeof(IMockService), typeof(MockService));
+        var resolver = registrar.Build();
+
+        // when
+        var actual = resolver.Resolve(typeof(IMockService));
+
+        // then
+        if (!ReferenceEquals(actual, instance))
+        {
+            throw new TestFailedException(
+                "Expected the resolver to return the first registered service.");
+        }
+    }
+
+    private static void RegisteringTypesMultipleTimesDoesNotFail(ITypeRegistrar registrar)
+    {
+        // given
+        try
+        {
+            registrar.Register(typeof(IMockService), typeof(MockService));
+            registrar.Register(typeof(IMockService), typeof(MockService));
+            registrar.RegisterInstance(typeof(IMockService), new MockService());
+            registrar.RegisterInstance(typeof(IMockService), new MockService());
+            registrar.RegisterLazy(typeof(IMockService), () => new MockService());
+            registrar.RegisterLazy(typeof(IMockService), () => new MockService());
+        }
+        catch (Exception ex)
+        {
+            throw new TestFailedException(
+                "Expected it to be possible to register the same interface multiple times",
+                ex);
+        }
+
+        // when nothing throws
+
+        // then all is good
     }
 
     private static void ResolvingNullTypeReturnsNull(ITypeRegistrar registrar)
