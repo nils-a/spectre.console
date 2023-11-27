@@ -87,3 +87,10 @@ there is a utility `TypeRegistrarBaseTests` available that can be used to ensure
 All interceptors must implement `ICommandInterceptor`. Upon execution of a command, an instance of your interceptor will be called with the parsed settings. This provides an opportunity for configuring any infrastructure or modifying the settings.
 
 For an example of using the interceptor to configure logging, see the [Serilog demo](https://github.com/spectreconsole/spectre.console/tree/main/examples/Cli/Logging).
+
+## Lifecycle
+
+Much like the `SetInterceptor`, the is a `SetStartup` to set an Action that is run before the execution of a command.
+(Startup will run directly after the Interceptor.)
+Additionally, for users using a custom DI setup, it is also possible to register an implementation of the `ICommandLifecycle` interface with the DI container.
+The `ICommandLifecycle` interface contains a method `StartupAsync` that gets the same parameters as the Action for `SetStartup`, however it will run asyncronusly.

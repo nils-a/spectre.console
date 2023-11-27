@@ -392,4 +392,23 @@ public static class ConfiguratorExtensions
         configurator.Settings.ExceptionHandler = exceptionHandler;
         return configurator;
     }
+
+    /// <summary>
+    /// Sets the Startup.
+    /// </summary>
+    /// <param name="configurator">The configurator.</param>
+    /// <param name="startup">The Action that contains the startup code.</param>
+    /// <returns>A configurator that can be used to configure the application further.</returns>
+    public static IConfigurator SetStartup(
+        this IConfigurator configurator,
+        Action<ITypeResolver, CommandContext, CommandSettings?> startup)
+    {
+        if (configurator == null)
+        {
+            throw new ArgumentNullException(nameof(configurator));
+        }
+
+        configurator.Settings.Startup = startup;
+        return configurator;
+    }
 }

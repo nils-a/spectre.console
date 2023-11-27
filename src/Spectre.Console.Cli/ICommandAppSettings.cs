@@ -94,4 +94,9 @@ public interface ICommandAppSettings
     /// a command. I.e. only when the resolver is available.
     /// </summary>
     public Func<Exception, ITypeResolver?, int>? ExceptionHandler { get; set; }
+
+    /// <summary>
+    /// Gets or sets a Startup that will run before each command execution.
+    /// </summary>
+    public Action<ITypeResolver, CommandContext, CommandSettings?>? Startup { get; set; }
 }

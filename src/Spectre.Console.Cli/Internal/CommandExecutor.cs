@@ -121,7 +121,7 @@ internal sealed class CommandExecutor
             VersionHelper.GetVersion(Assembly.GetEntryAssembly());
     }
 
-    private static Task<int> Execute(
+    private static async Task<int> Execute(
         CommandTree leaf,
         CommandTree tree,
         CommandContext context,
@@ -133,6 +133,7 @@ internal sealed class CommandExecutor
             // Bind the command tree against the settings.
             var settings = CommandBinder.Bind(tree, leaf.Command.SettingsType, resolver);
             configuration.Settings.Interceptor?.Intercept(context, settings);
+            await RunStartup(resolver, configuration, context, settings).ConfigureAwait(false);
 
             // Create and validate the command.
             var command = leaf.CreateCommand(resolver);
@@ -143,11 +144,24 @@ internal sealed class CommandExecutor
             }
 
             // Execute the command.
-            return command.Execute(context, settings);
+            return await command.Execute(context, settings);
         }
         catch (Exception ex) when (configuration.Settings is { ExceptionHandler: not null, PropagateExceptions: false })
         {
-            return Task.FromResult(configuration.Settings.ExceptionHandler(ex, resolver));
+            return configuration.Settings.ExceptionHandler(ex, resolver);
         }
+    }
+
+    private static Task RunStartup(
+        ITypeResolver resolver,
+        IConfiguration configuration,
+        CommandContext context,
+        CommandSettings? settings)
+    {
+        configuration.Settings.Startup?.Invoke(resolver, context, settings);
+        var startupTasks = resolver.Resolve(typeof(IEnumerable<ICommandLifecycle>)) as IEnumerable<ICommandLifecycle>;
+        return startupTasks == null
+            ? Task.CompletedTask
+            : Task.WhenAll(startupTasks.Select(s => s.StartupAsync(resolver, context, settings)));
     }
 }

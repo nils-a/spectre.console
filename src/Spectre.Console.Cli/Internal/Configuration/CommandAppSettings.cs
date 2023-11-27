@@ -22,6 +22,8 @@ internal sealed class CommandAppSettings : ICommandAppSettings
 
     public Func<Exception, ITypeResolver?, int>? ExceptionHandler { get; set; }
 
+    public Action<ITypeResolver, CommandContext, CommandSettings?>? Startup { get; set; }
+
     public CommandAppSettings(ITypeRegistrar registrar)
     {
         Registrar = new TypeRegistrar(registrar);
