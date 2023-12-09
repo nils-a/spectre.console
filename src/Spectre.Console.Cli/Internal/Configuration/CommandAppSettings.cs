@@ -8,7 +8,10 @@ internal sealed class CommandAppSettings : ICommandAppSettings
     public int MaximumIndirectExamples { get; set; }
     public bool ShowOptionDefaultValues { get; set; }
     public IAnsiConsole? Console { get; set; }
+    [Obsolete]
     public ICommandInterceptor? Interceptor { get; set; }
+    public ICommandSettingsInterceptor? SettingsInterceptor { get; set; }
+    public ICommandResultInterceptor? ResultInterceptor { get; set; }
     public ITypeRegistrarFrontend Registrar { get; set; }
     public CaseSensitivity CaseSensitivity { get; set; }
     public bool PropagateExceptions { get; set; }

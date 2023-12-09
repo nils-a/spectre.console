@@ -84,6 +84,8 @@ there is a utility `TypeRegistrarBaseTests` available that can be used to ensure
 
 `CommandApp` also provides a `SetInterceptor` configuration. An interceptor is run before all commands are executed. This is typically used for configuring logging or other infrastructure concerns.
 
-All interceptors must implement `ICommandInterceptor`. Upon execution of a command, an instance of your interceptor will be called with the parsed settings. This provides an opportunity for configuring any infrastructure or modifying the settings.
+An interceptor can implement `ICommandSettingsInterceptor`. Upon execution of a command, the instance of your interceptor will be called with the parsed settings. This provides an opportunity for configuring any infrastructure or modifying the settings.
+
+Additionally, an interceptor can implement `ICommandResultInterceptor`. After the execution of a command, the instance of your interceptor will be called with the result. This provides an opportunity for modifying the result and for executing any "teardown" actions.
 
 For an example of using the interceptor to configure logging, see the [Serilog demo](https://github.com/spectreconsole/spectre.console/tree/main/examples/Cli/Logging).

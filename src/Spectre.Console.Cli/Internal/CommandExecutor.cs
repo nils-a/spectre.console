@@ -121,7 +121,7 @@ internal sealed class CommandExecutor
             VersionHelper.GetVersion(Assembly.GetEntryAssembly());
     }
 
-    private static Task<int> Execute(
+    private static async Task<int> Execute(
         CommandTree leaf,
         CommandTree tree,
         CommandContext context,
@@ -132,7 +132,10 @@ internal sealed class CommandExecutor
         {
             // Bind the command tree against the settings.
             var settings = CommandBinder.Bind(tree, leaf.Command.SettingsType, resolver);
+#pragma warning disable CS0612 // Type or member is obsolete
             configuration.Settings.Interceptor?.Intercept(context, settings);
+#pragma warning restore CS0612 // Type or member is obsolete
+            configuration.Settings.SettingsInterceptor?.Intercept(context, settings, resolver);
 
             // Create and validate the command.
             var command = leaf.CreateCommand(resolver);
@@ -143,11 +146,13 @@ internal sealed class CommandExecutor
             }
 
             // Execute the command.
-            return command.Execute(context, settings);
+            var result = await command.Execute(context, settings);
+            configuration.Settings.ResultInterceptor?.Intercept(context, settings, resolver, ref result);
+            return result;
         }
         catch (Exception ex) when (configuration.Settings is { ExceptionHandler: not null, PropagateExceptions: false })
         {
-            return Task.FromResult(configuration.Settings.ExceptionHandler(ex, resolver));
+            return configuration.Settings.ExceptionHandler(ex, resolver);
         }
     }
 }

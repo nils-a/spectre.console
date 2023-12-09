@@ -50,7 +50,20 @@ public interface ICommandAppSettings
     /// Gets or sets the <see cref="ICommandInterceptor"/> used
     /// to intercept settings before it's being sent to the command.
     /// </summary>
+    [Obsolete]
     ICommandInterceptor? Interceptor { get; set; }
+
+    /// <summary>
+    /// Gets or sets the <see cref="ICommandSettingsInterceptor"/> used
+    /// to intercept settings before it's being sent to the command.
+    /// </summary>
+    ICommandSettingsInterceptor? SettingsInterceptor { get; set; }
+
+    /// <summary>
+    /// Gets or sets the <see cref="ICommandResultInterceptor"/> used
+    /// to intercept the result from the command before it's being returned.
+    /// </summary>
+    ICommandResultInterceptor? ResultInterceptor { get; set; }
 
     /// <summary>
     /// Gets the type registrar.

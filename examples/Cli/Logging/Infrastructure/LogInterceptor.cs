@@ -4,11 +4,11 @@ using Spectre.Console.Cli;
 
 namespace Logging.Infrastructure;
 
-public class LogInterceptor : ICommandInterceptor
+public class LogInterceptor : ICommandSettingsInterceptor
 {
     public static readonly LoggingLevelSwitch LogLevel = new();
 
-    public void Intercept(CommandContext context, CommandSettings settings)
+    public void Intercept(CommandContext context, CommandSettings settings, ITypeResolver resolver)
     {
         if (settings is LogCommandSettings logSettings)
         {

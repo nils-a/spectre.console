@@ -3,7 +3,7 @@ namespace Spectre.Console.Testing;
 /// <summary>
 /// A <see cref="ICommandInterceptor"/> that triggers a callback when invoked.
 /// </summary>
-public sealed class CallbackCommandInterceptor : ICommandInterceptor
+public sealed class CallbackCommandInterceptor : ICommandSettingsInterceptor
 {
     private readonly Action<CommandContext, CommandSettings> _callback;
 
@@ -17,7 +17,7 @@ public sealed class CallbackCommandInterceptor : ICommandInterceptor
     }
 
     /// <inheritdoc/>
-    public void Intercept(CommandContext context, CommandSettings settings)
+    public void Intercept(CommandContext context, CommandSettings settings, ITypeResolver unused)
     {
         _callback(context, settings);
     }
