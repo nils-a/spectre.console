@@ -174,4 +174,24 @@ public sealed class MarkupTests
 └─────────────────┘
 ".NormalizeLineEndings());
     }
+
+    [Fact]
+    [GitHubIssue("https://github.com/spectreconsole/spectre.console/issues/363")]
+    public void Should_Not_Split_EmptyLink_on_LineBreak()
+    {
+        // Given
+        const string Link = "https://github.com/spectreconsole/spectre.console/issues/363";
+        var console = new TestConsole()
+            .Width(40) // This makes the console require 2 lines to render the link.
+            .EmitAnsiSequences();
+
+        // When
+        console.Markup($"[link]{Link}[/]");
+
+        // Then
+        var lines = console.Output.NormalizeLineEndings().Split('\n').ToArray();
+        lines.Length.ShouldBe(2);
+        lines[0].ShouldContain(";https://github.com/spectreconsole/spectre.console/issues/363\u001b\\https://github.com/spectreconsole/spectr");
+        lines[1].ShouldContain(";https://github.com/spectreconsole/spectre.console/issues/363\u001b\\e.console/issues/363");
+    }
 }

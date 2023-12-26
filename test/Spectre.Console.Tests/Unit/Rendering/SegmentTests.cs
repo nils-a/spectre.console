@@ -140,4 +140,123 @@ public sealed class SegmentTests
             lines[3][0].Text.ShouldBe("Corgi");
         }
     }
+
+    [Fact]
+    public void Should_Split_with_EmptyLink_To_Non_EmptyLinks()
+    {
+        // Given
+        const string Link = "https://some.link/somewhere";
+        var segment = new Segment(Link, new Style(link: Constants.EmptyLink));
+
+        // When
+        var (first, second) = segment.Split(20);
+
+        // Then
+        first.Style.Link.ShouldBe(Link);
+        second.Style.Link.ShouldBe(Link);
+    }
+
+    [Fact]
+    public void Should_SplitLines_with_EmptyLink_To_Non_EmptyLinks_Long_Lines()
+    {
+        // Given
+        const string Link = "https://some.link/somewhere";
+        var segment = new Segment(Link, new Style(link: Constants.EmptyLink));
+
+        // When
+        var lines = Segment.SplitLines(new[] { segment }, 20);
+
+        // Then
+        lines.Count.ShouldBe(2);
+        lines[0][0].Style.Link.ShouldBe(Link);
+        lines[1][0].Style.Link.ShouldBe(Link);
+    }
+
+    [Fact]
+    public void Should_SplitLines_with_EmptyLink_To_Non_EmptyLinks_Short_Lines()
+    {
+        // Given
+        const string Link = "https://some.link/somewhere";
+        var segment = new Segment(Link, new Style(link: Constants.EmptyLink));
+
+        // When
+        var lines = Segment.SplitLines(new[] { segment }, Link.Length + 1);
+
+        // Then
+        lines.Count.ShouldBe(1);
+        lines[0][0].Style.Link.ShouldBe(Link);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData(Overflow.Fold)]
+    [InlineData(Overflow.Ellipsis)]
+    [InlineData(Overflow.Crop)]
+    public void Should_SplitOverflow_with_EmptyLink_To_Non_EmptyLinks(Overflow? overflow)
+    {
+        // Given
+        const string Link = "https://some.link/somewhere";
+        var segment = new Segment(Link, new Style(link: Constants.EmptyLink));
+
+        // When
+        var segments = Segment.SplitOverflow(segment, overflow, 20);
+
+        // Then
+        foreach (var s in segments)
+        {
+            s.Style.Link.ShouldBe(Link);
+        }
+    }
+
+    [Fact]
+    public void Should_Truncate_with_EmptyLink_To_Non_EmptyLinks()
+    {
+        // Given
+        const string Link = "https://some.link/somewhere";
+        var segment = new Segment(Link, new Style(link: Constants.EmptyLink));
+
+        // When
+        var segments = Segment.Truncate(new[] { segment }, 20);
+
+        // Then
+        foreach (var s in segments)
+        {
+            s.Style.Link.ShouldBe(Link);
+        }
+    }
+
+    [Fact]
+    public void Should_TruncateWithEllipsis_with_EmptyLink_To_Non_EmptyLinks()
+    {
+        // Given
+        const string Link = "https://some.link/somewhere";
+        var segment = new Segment(Link, new Style(link: Constants.EmptyLink));
+
+        // When
+        var segments = Segment.TruncateWithEllipsis(new[] { segment }, 20);
+
+        // Then
+        foreach (var s in segments)
+        {
+            s.Style.Link.ShouldBe(Link);
+        }
+    }
+
+    [Fact]
+    public void Should_Merge_with_EmptyLink_To_Two_Non_EmptyLinks()
+    {
+        // Given
+        const string Link1 = "https://some.link/somewhere";
+        const string Link2 = "https://some.other.link/somewhere/else";
+        var segment1 = new Segment(Link1, new Style(link: Constants.EmptyLink));
+        var segment2 = new Segment(Link2, new Style(link: Constants.EmptyLink));
+
+        // When
+        var segments = Segment.Merge(new[] { segment1, segment2 }).ToArray();
+
+        // Then
+        segments.Length.ShouldBe(2);
+        segments[0].Style.Link.ShouldBe(Link1);
+        segments[1].Style.Link.ShouldBe(Link2);
+    }
 }

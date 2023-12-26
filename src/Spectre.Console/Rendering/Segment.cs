@@ -167,9 +167,16 @@ public class Segment
             }
         }
 
+        var style = Style;
+        if (style.Link == Constants.EmptyLink)
+        {
+            // resolve the link now, before we split anything..
+            style = style.Combine(new Style(link: Text));
+        }
+
         return (
-            new Segment(Text.Substring(0, index), Style),
-            new Segment(Text.Substring(index, Text.Length - index), Style));
+            new Segment(Text.Substring(0, index), style),
+            new Segment(Text.Substring(index, Text.Length - index), style));
     }
 
     /// <summary>
@@ -218,6 +225,14 @@ public class Segment
         while (stack.Count > 0)
         {
             var segment = stack.Pop();
+            if (segment.Style.Link == Constants.EmptyLink)
+            {
+                // resolve the link now, before we split anything..
+                segment = new Segment(
+                    segment.Text,
+                    segment.Style.Combine(new Style(link: segment.Text)));
+            }
+
             var segmentLength = segment.CellCount();
 
             // Does this segment make the line exceed the max width?
@@ -340,35 +355,41 @@ public class Segment
         overflow ??= Overflow.Fold;
 
         var result = new List<Segment>();
+        var style = segment.Style;
+        if (style.Link == Constants.EmptyLink)
+        {
+            // resolve the link now, before we split anything..
+            style = style.Combine(new Style(link: segment.Text));
+        }
 
         if (overflow == Overflow.Fold)
         {
             var splitted = SplitSegment(segment.Text, maxWidth);
             foreach (var str in splitted)
             {
-                result.Add(new Segment(str, segment.Style));
+                result.Add(new Segment(str, style));
             }
         }
         else if (overflow == Overflow.Crop)
         {
             if (Math.Max(0, maxWidth - 1) == 0)
             {
-                result.Add(new Segment(string.Empty, segment.Style));
+                result.Add(new Segment(string.Empty, style));
             }
             else
             {
-                result.Add(new Segment(segment.Text.Substring(0, maxWidth), segment.Style));
+                result.Add(new Segment(segment.Text.Substring(0, maxWidth), style));
             }
         }
         else if (overflow == Overflow.Ellipsis)
         {
             if (Math.Max(0, maxWidth - 1) == 0)
             {
-                result.Add(new Segment("…", segment.Style));
+                result.Add(new Segment("…", style));
             }
             else
             {
-                result.Add(new Segment(segment.Text.Substring(0, maxWidth - 1) + "…", segment.Style));
+                result.Add(new Segment(segment.Text.Substring(0, maxWidth - 1) + "…", style));
             }
         }
 
@@ -450,7 +471,14 @@ public class Segment
             return null;
         }
 
-        return new Segment(builder.ToString(), segment.Style);
+        var style = segment.Style;
+        if (style.Link == Constants.EmptyLink)
+        {
+            // resolve the link now, before we truncate anything..
+            style = style.Combine(new Style(link: segment.Text));
+        }
+
+        return new Segment(builder.ToString(), style);
     }
 
     internal static IEnumerable<Segment> Merge(IEnumerable<Segment> segments)
@@ -463,8 +491,17 @@ public class Segment
         var result = new List<Segment>();
 
         var segmentBuilder = (SegmentBuilder?)null;
-        foreach (var segment in segments)
+        foreach (var s in segments)
         {
+            var segment = s;
+            if (segment.Style.Link == Constants.EmptyLink)
+            {
+                // resolve the link now, before we merge anything..
+                segment = new Segment(
+                    s.Text,
+                    s.Style.Combine(new Style(link: s.Text)));
+            }
+
             if (segmentBuilder == null)
             {
                 segmentBuilder = new SegmentBuilder(segment);
